@@ -53,16 +53,16 @@ async function getRevenueOverTime(from, to) {
   const where = buildWhere(from, to);
   const sql = `
     SELECT
-      FORMAT_TIMESTAMP('%Y-%m', fecha) AS month,
+      FORMAT_TIMESTAMP('%Y-%m-%d', fecha) AS day,
       SUM(revenue) AS value
     FROM \`${config.bigquery.projectId}.${config.bigquery.dataset}.${config.bigquery.table}\`
     ${where}
-    GROUP BY month
-    ORDER BY month
+    GROUP BY day
+    ORDER BY day
   `;
   const rows = await query(sql);
   return {
-    labels: rows.map(r => r.month),
+    labels: rows.map(r => r.day),
     values: rows.map(r => r.value),
   };
 }

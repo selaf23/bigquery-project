@@ -17,13 +17,10 @@ function generateRows() {
   const rows = [];
   for (let year = 2024; year <= 2025; year++) {
     for (let month = 1; month <= 12; month++) {
-      const daysInMonth = new Date(year, month, 0).getDate();
+      const days = new Date(year, month, 0).getDate();
       for (const category of CATEGORIES) {
         for (const region of REGIONS) {
-          const day = randomInt(1, daysInMonth);
-          const fecha = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-          const baseRevenue =
+          const baseMonthlyRevenue =
             category === 'Electrónica' ? 50000 :
             category === 'Ropa' ? 30000 :
             category === 'Hogar' ? 25000 :
@@ -39,12 +36,18 @@ function generateRows() {
             region === 'Este' ? 1.0 :
             region === 'Oeste' ? 0.9 : 0.8;
 
-          const noise = 0.8 + Math.random() * 0.4;
-          const revenue = Math.round(baseRevenue * seasonFactor * regionFactor * noise);
-          const quantity = Math.round(revenue / (category === 'Electrónica' ? 500 : category === 'Ropa' ? 200 : 150));
-          const avgPrice = Math.round(revenue / quantity);
+          const monthlyTotal = baseMonthlyRevenue * seasonFactor * regionFactor;
+          const dailyBase = monthlyTotal / days;
 
-          rows.push({ fecha, category, region, revenue, quantity, avg_price: avgPrice });
+          for (let day = 1; day <= days; day++) {
+            const noise = 0.6 + Math.random() * 0.8;
+            const fecha = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const revenue = Math.round(dailyBase * noise);
+            const quantity = Math.round(revenue / (category === 'Electrónica' ? 500 : category === 'Ropa' ? 200 : 150));
+            const avgPrice = Math.round(revenue / quantity);
+
+            rows.push({ fecha, category, region, revenue, quantity, avg_price: avgPrice });
+          }
         }
       }
     }
